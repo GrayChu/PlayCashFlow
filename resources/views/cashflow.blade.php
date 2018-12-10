@@ -91,9 +91,9 @@
                             .append('line')
                             .attr({
                                 x1: 60 + chart.xAxis.scale()(new Date('2018-07-01')),
-                                y1: 30 + chart.yAxis.scale()(200000),
+                                y1: 30 + chart.yAxis.scale()(600000),
                                 x2: 60 + chart.xAxis.scale()(new Date('2018-12-01')),
-                                y2: 30 + chart.yAxis.scale()(200000)
+                                y2: 30 + chart.yAxis.scale()(600000)
                             })
                             .style({"stroke" :"#ff0000","stroke-width":"3","stroke-dasharray":"4,4"});
 
