@@ -8,7 +8,16 @@
             height: 400px;
             width:100%;
         }
-
+        div.tooltip {
+            position: absolute;
+            text-align: center;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: cornsilk;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
     </style>
     </head>
     <body>
@@ -16,8 +25,8 @@
           <svg></svg>
       </div>
       <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-              <div class="modal-content">
+          <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content" >
                   <div class="modal-header">
                       <h5 class="modal-title" id="exampleModalLabel">交易明細</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -30,7 +39,7 @@
                             <tr>
                                 <th colspan="3" class="text-center">Last</th>
                                 <th id="presum"></th>
-                                <th></th>
+                                <th colspan="2"></th>
                             </tr>
                             <tr>
                                 <th>種類</th>
@@ -38,6 +47,7 @@
                                 <th>對象</th>
                                 <th>金額</th>
                                 <th>日期</th>
+                                <th>備註</th>
                             </tr>
                           </thead>
                           <tbody id="contents">
@@ -50,13 +60,13 @@
               </div>
           </div>
       </div>
-        <link href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css" rel="stylesheet"></link>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+      <link href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css" rel="stylesheet"></link>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
       <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" ></script>
-        <script src="https://d3js.org/d3.v3.min.js"></script>
-        <script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.js"></script>
+      <script src="https://d3js.org/d3.v3.min.js"></script>
+      <script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.js"></script>
       <script>
                 d3.json("{{asset('cumulativeLineData.json')}}", function(data) {
 
@@ -66,6 +76,7 @@
                             .x(function(d) {return Date.parse(d[0])})
                             .y(function(d) { return d[1] })
                             .color(d3.scale.category10().range())
+                                .yDomain([0,1000000])
                             //.useInteractiveGuideline(true)
                         ;
 
@@ -79,22 +90,40 @@
 
 
 
-
                         d3.select('#chart svg')
                             .datum(data)
                             .transition().duration(500)
                             .call(chart)
                         ;
 
+                        var tip = d3.select("body").append("div")
+                            .attr("class", "tooltip")
+                            .style("opacity", 0);
+
                         var line = d3.select('#chart svg')
                             .append('line')
                             .attr({
-                                x1: 60 + chart.xAxis.scale()(new Date('2018-07-01')),
+                                x1: 60 + chart.xAxis.scale()(new Date('2018-12-01')),
                                 y1: 30 + chart.yAxis.scale()(600000),
-                                x2: 60 + chart.xAxis.scale()(new Date('2018-12-01')),
+                                x2: 60 + chart.xAxis.scale()(new Date('2019-05-01')),
                                 y2: 30 + chart.yAxis.scale()(600000)
                             })
-                            .style({"stroke" :"#ff0000","stroke-width":"3","stroke-dasharray":"4,4"});
+                            .style({"stroke" :"#ff0000","stroke-width":"3","stroke-dasharray":"4,4"})
+                            .on("mouseover", function(d) {
+                                tip.transition()
+                                    .duration(500)
+                                    .style("opacity", 1);
+                                tip.html("安全水位<br>"+"計算方式:(固定支出)*6")
+                                    .style("left", (d3.event.pageX) + "px")
+                                    .style("top", (d3.event.pageY - 28) + "px");
+                            })
+                            .on("mouseout", function(d) {
+                                tip.transition()
+                                    .duration(500)
+                                    .style("opacity", 0);
+                            });
+
+
 
                         chart.lines.dispatch.on('elementClick', function(e) {
 
@@ -123,17 +152,18 @@
                         newtd+="<td><font color='red'>"+e[2][i][2]+"</font></td>";
 
                         newtd+="<td>"+e[0]+"</td>";
+                        newtd+="<td></td>";
                         newtr.append(newtd);
                         $("#contents").append(newtr);
                         total+=parseInt(e[2][i][2]);
                     }
-                    console.log(total);
+
                     $("#presum").text(e[3]);
                     let newtr=$("<tr>");
                     let newtd="";
                     newtd+="<td colspan='3' class='text-center'><b>Now<b></td>";
                     newtd+="<td><font color='green'><b>"+(parseInt(e[3])+total)+"</b></font></td>";
-                    newtd+="<td></td>";
+                    newtd+="<td colspan='2'></td>";
                     newtr.append(newtd);
                     $("#contents").append(newtr);
                     $('#exampleModal').modal('show');
