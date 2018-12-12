@@ -28,19 +28,20 @@
                       <table class="table table-bordered">
                           <thead>
                             <tr>
-                                <th>日期</th>
+                                <th colspan="3" class="text-center">Last</th>
+                                <th id="presum"></th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <th>種類</th>
                                 <th>單號</th>
-                                <th>付款人</th>
+                                <th>對象</th>
                                 <th>金額</th>
+                                <th>日期</th>
                             </tr>
                           </thead>
-                          <tbody>
-                            <tr>
-                                <td id="td1"></td>
-                                <td id="td2"></td>
-                                <td id="td3"></td>
-                                <td id="td4"></td>
-                            </tr>
+                          <tbody id="contents">
+
                           </tbody>
                       </table>
                   </div>
@@ -60,8 +61,6 @@
                 d3.json("{{asset('cumulativeLineData.json')}}", function(data) {
 
                     nv.addGraph(function() {
-
-
 
                         var chart = nv.models.lineChart()
                             .x(function(d) {return Date.parse(d[0])})
@@ -98,6 +97,7 @@
                             .style({"stroke" :"#ff0000","stroke-width":"3","stroke-dasharray":"4,4"});
 
                         chart.lines.dispatch.on('elementClick', function(e) {
+
                             getInfo(e.point);
                         });
 
@@ -108,14 +108,34 @@
 
                 });
                 let getInfo=(e)=>{
-                    $('#td1').empty();
-                    $('#td2').empty();
-                    $('#td3').empty();
-                    $('#td4').empty();
-                    $('#td1').text(e[0]);
-                    $('#td2').text(e[2]);
-                    $('#td3').text(e[3]);
-                    $('#td4').text(e[4]);
+
+                    $("#contents").empty();
+                    $("#presum").empty();
+                    let total=0;
+                    for(let i=0;i<e[2].length;i++)
+                    {
+                        let newtr=$("<tr>");
+                        let newtd="";
+
+                        newtd+="<td>"+e[2][i][3]+"</td>";
+                        newtd+="<td>"+e[2][i][0]+"</td>";
+                        newtd+="<td>"+e[2][i][1]+"</td>";
+                        newtd+="<td><font color='red'>"+e[2][i][2]+"</font></td>";
+
+                        newtd+="<td>"+e[0]+"</td>";
+                        newtr.append(newtd);
+                        $("#contents").append(newtr);
+                        total+=parseInt(e[2][i][2]);
+                    }
+                    console.log(total);
+                    $("#presum").text(e[3]);
+                    let newtr=$("<tr>");
+                    let newtd="";
+                    newtd+="<td colspan='3' class='text-center'><b>Now<b></td>";
+                    newtd+="<td><font color='green'><b>"+(parseInt(e[3])+total)+"</b></font></td>";
+                    newtd+="<td></td>";
+                    newtr.append(newtd);
+                    $("#contents").append(newtr);
                     $('#exampleModal').modal('show');
                 }
         </script>
