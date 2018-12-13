@@ -5,8 +5,9 @@
     <style>
 
         #chart svg {
-            height: 400px;
+            height: 500px;
             width:100%;
+            overflow:visible;
         }
         div.tooltip {
             position: absolute;
@@ -77,8 +78,9 @@
                             .y(function(d) { return d[1] })
                             .color(d3.scale.category10().range())
                                 .yDomain([0,1000000])
+                            .margin({left:60,bottom:100});
                             //.useInteractiveGuideline(true)
-                        ;
+
 
 
                         chart.xAxis
@@ -86,7 +88,8 @@
                             .tickFormat(function(d) {
 
                                 return d3.time.format('%Y-%m-%d')(new Date(d))
-                            });
+                            })
+                            .rotateLabels(-90);
 
 
 
