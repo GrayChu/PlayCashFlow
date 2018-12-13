@@ -122,7 +122,9 @@
                                     .duration(500)
                                     .style("opacity", 0);
                             });
+                        var $svg = $('#chart svg');
 
+                        $svg.parent().prepend('<div class="chart-title" style="text-align:center">Cash Flow Chart</div>');
 
 
                         chart.lines.dispatch.on('elementClick', function(e) {
