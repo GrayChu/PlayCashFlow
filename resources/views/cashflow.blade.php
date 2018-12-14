@@ -103,9 +103,7 @@
                             .color(d3.scale.category10().range())
                                 .yDomain([0,1000000])
                             .margin({left:60,bottom:100});
-                            //.useInteractiveGuideline(true)
 
-                        chart.clipRadius(10);
 
                         chart.xAxis
                             .ticks(10)
@@ -114,7 +112,7 @@
                                 return d3.time.format('%Y-%m-%d')(new Date(d))
                             })
                             .rotateLabels(-90)
-                            
+
                         chart.yAxis
                             .tickFormat(function(d){
                                 return Common.Money.format(d);
@@ -130,9 +128,6 @@
                             .call(chart)
                         ;
 
-                        var tip = d3.select("body").append("div")
-                            .attr("class", "tooltip")
-                            .style("opacity", 0);
 
                         var line = d3.select('#chart svg')
                             .append('line')
@@ -162,7 +157,7 @@
 
                 });
                 let getInfo=(e,f)=>{
-                    console.log(f);
+                    
                     $("#contents").empty();
                     $("#presum").empty();
                     let total=0;
