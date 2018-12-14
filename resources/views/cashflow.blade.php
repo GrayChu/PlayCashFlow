@@ -20,6 +20,11 @@
             border-radius: 8px;
             pointer-events: none;
         }
+        .nv-point {
+            stroke-opacity: 1 !important;
+            stroke-width: 5px;
+            fill-opacity: 1 !important;
+        }
     </style>
     </head>
     <body>
@@ -100,7 +105,7 @@
                             .margin({left:60,bottom:100});
                             //.useInteractiveGuideline(true)
 
-
+                        chart.clipRadius(10);
 
                         chart.xAxis
                             .ticks(10)
@@ -108,7 +113,14 @@
 
                                 return d3.time.format('%Y-%m-%d')(new Date(d))
                             })
-                            .rotateLabels(-90);
+                            .rotateLabels(-90)
+                            .axisLabel('日期');
+                        chart.yAxis
+                            .tickFormat(function(d){
+                                return Common.Money.format(d);
+                            })
+                            .axisLabel('金額(NTD)');
+
 
 
 
