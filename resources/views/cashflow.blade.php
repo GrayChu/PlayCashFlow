@@ -8,6 +8,7 @@
             height: 500px;
             width:100%;
             overflow:visible;
+
         }
         div.tooltip {
             position: absolute;
@@ -61,6 +62,23 @@
               </div>
           </div>
       </div>
+      <div class="modal fade" id="safeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content" >
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">安全水位</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      計算方式:(固定支出)*6
+                  </div>
+                  <div class="modal-footer">
+                  </div>
+              </div>
+          </div>
+      </div>
       <link href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css" rel="stylesheet"></link>
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
       <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
@@ -68,6 +86,7 @@
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" ></script>
       <script src="https://d3js.org/d3.v3.min.js"></script>
       <script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.js"></script>
+      <script src="{{asset('js/common.js')}}"></script>
       <script>
                 d3.json("{{asset('cumulativeLineData.json')}}", function(data) {
 
@@ -111,19 +130,9 @@
                                 x2: 60 + chart.xAxis.scale()(new Date('2019-05-01')),
                                 y2: 30 + chart.yAxis.scale()(600000)
                             })
-                            .style({"stroke" :"#ff0000","stroke-width":"3","stroke-dasharray":"4,4"})
-                            .on("mouseover", function(d) {
-                                tip.transition()
-                                    .duration(500)
-                                    .style("opacity", 1);
-                                tip.html("安全水位<br>"+"計算方式:(固定支出)*6")
-                                    .style("left", (d3.event.pageX) + "px")
-                                    .style("top", (d3.event.pageY - 28) + "px");
-                            })
-                            .on("mouseout", function(d) {
-                                tip.transition()
-                                    .duration(500)
-                                    .style("opacity", 0);
+                            .style({"stroke" :"#ff0000","stroke-width":"4","stroke-dasharray":"4,4"})
+                            .on("click", function(d) {
+                                $('#safeModal').modal('show');
                             });
                         var $svg = $('#chart svg');
 
@@ -131,8 +140,7 @@
 
 
                         chart.lines.dispatch.on('elementClick', function(e) {
-
-                            getInfo(e.point);
+                            getInfo(e.point,e.series.key);
                         });
 
                         nv.utils.windowResize(chart.update);
@@ -141,8 +149,8 @@
                     });
 
                 });
-                let getInfo=(e)=>{
-
+                let getInfo=(e,f)=>{
+                    console.log(f);
                     $("#contents").empty();
                     $("#presum").empty();
                     let total=0;
@@ -154,20 +162,20 @@
                         newtd+="<td>"+e[2][i][3]+"</td>";
                         newtd+="<td>"+e[2][i][0]+"</td>";
                         newtd+="<td>"+e[2][i][1]+"</td>";
-                        newtd+="<td><font color='red'>"+e[2][i][2]+"</font></td>";
+                        newtd+="<td><font color='red'>"+((f==="Deposit")?"-":"")+Common.Money.format(e[2][i][2])+" NTD</font></td>";
 
                         newtd+="<td>"+e[0]+"</td>";
                         newtd+="<td></td>";
                         newtr.append(newtd);
                         $("#contents").append(newtr);
-                        total+=parseInt(e[2][i][2]);
+                        total+=parseInt(e[2][i][2]*((f==="Deposit")?(-1):(1)));
                     }
 
-                    $("#presum").text(e[3]);
+                    $("#presum").text(Common.Money.format(e[3])+" NTD");
                     let newtr=$("<tr>");
                     let newtd="";
                     newtd+="<td colspan='3' class='text-center'><b>Now<b></td>";
-                    newtd+="<td><font color='green'><b>"+(parseInt(e[3])+total)+"</b></font></td>";
+                    newtd+="<td><font color='green'><b>"+Common.Money.format(parseInt(e[3])+total)+" NTD</b></font></td>";
                     newtd+="<td colspan='2'></td>";
                     newtr.append(newtd);
                     $("#contents").append(newtr);
