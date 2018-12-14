@@ -71,13 +71,13 @@
           <div class="modal-dialog" role="document">
               <div class="modal-content" >
                   <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalLabel">安全水位</h5>
+                      <h5 class="modal-title" id="exampleModalLabel">資金安全水位</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                       </button>
                   </div>
                   <div class="modal-body">
-                      計算方式:(固定支出)*6
+                      計算方式:(每月固定支出)x6
                   </div>
                   <div class="modal-footer">
                   </div>
@@ -114,7 +114,7 @@
                                 return d3.time.format('%Y-%m-%d')(new Date(d))
                             })
                             .rotateLabels(-90)
-                            .axisLabel('日期');
+                            
                         chart.yAxis
                             .tickFormat(function(d){
                                 return Common.Money.format(d);
@@ -148,7 +148,7 @@
                             });
                         var $svg = $('#chart svg');
 
-                        $svg.parent().prepend('<div class="chart-title" style="text-align:center">Cash Flow Chart</div>');
+                        $svg.parent().prepend('<div class="chart-title" style="text-align:center"><font size="72">Cash Flow Chart</font></div>');
 
 
                         chart.lines.dispatch.on('elementClick', function(e) {
